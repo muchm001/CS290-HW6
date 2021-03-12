@@ -1,0 +1,71 @@
+<h1>Database Backed Workout Tracker</h1>
+
+{{#if updateForm}}
+
+  <h3>Update Exercise:</h3>
+  <fieldset>
+  <form id="updateExercise" action="" method="post">
+    <input type="hidden" name="id" value="{{id}}">
+    Exercise name:
+    <input type="text" name="name" id="name" value="{{name}}">
+    <br>
+    Number of reps:
+    <input type="number" name="reps" id="reps" value="{{reps}}">
+    <br>
+    Weight of weights used:
+    <input type="number" name="weight" id="weight" value="{{weight}}">
+    <br>
+    Date performed:
+    <input type="date" name="date" id="date" value="{{date}}">
+    <br>
+    Unit of measure for weight:
+    {{#if lbsUsed}}
+    <select name="lbs" id="lbs">
+      <option value="1">lbs</option>
+      <option value="0">kg</option>
+    </select>
+    
+    {{else}}
+    <select name="lbs" id="lbs">
+      <option value="0">kg</option>
+      <option value="1">lbs</option>
+    </select>
+    
+    {{/if}}
+    
+    <br>
+    <input type="submit" name="updateExerciseButton" value="Update Exercise" id="updateExerciseButton">
+  </form>
+</fieldset>
+
+{{else}}
+
+<h3>Add a new exercise:</h3>
+<fieldset>
+  <form id="addExercise" action="" method="get">
+    Exercise name:
+    <input type="text" name="name" id="name">
+    <br>
+    Number of reps:
+    <input type="number" name="reps" id="reps">
+    <br>
+    Weight of weights used:
+    <input type="number" name="weight" id="weight">
+    <br>
+    Date performed:
+    <input type="date" name="date" id="date">
+    <br>
+    Unit of measure for weight:
+    <select name="lbs" id="lbs">
+      <option value="1">lbs</option>
+      <option value="0">kg</option>
+    </select>
+    <br>
+    <input type="submit" name="addExerciseButton" value="Add Exercise" id="addExerciseButton">
+  </form>
+</fieldset>
+<h3>Current Exercises</h3>
+{{results}}
+<div id="tableToBeConstructed"></div>
+<div style="color:red">{{errorResults}}</div>
+{{/if}}

@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="357c6c71-3e19-4ef5-af36-eda3503b11e2" name="Default Changelist" comment="ok" />
+    <list default="true" id="357c6c71-3e19-4ef5-af36-eda3503b11e2" name="Default Changelist" comment="ok">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+    </list>
     <list id="15bbd1fc-e9f1-45a9-b769-eb282f258189" name="New changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,7 +36,6 @@
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="javascript.nodejs.core.library.configured.version" value="14.15.4" />
     <property name="javascript.nodejs.core.library.typings.version" value="14.14.33" />
@@ -60,7 +63,7 @@
       <workItem from="1615507621876" duration="6852000" />
       <workItem from="1615585428279" duration="1643000" />
       <workItem from="1615587541424" duration="37000" />
-      <workItem from="1615590620171" duration="79000" />
+      <workItem from="1615590620171" duration="891000" />
     </task>
     <task id="LOCAL-00001" summary="ok">
       <created>1615577806908</created>

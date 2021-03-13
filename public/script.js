@@ -1,276 +1,180 @@
-document.addEventListener('DOMContentLoaded', bindButtons(event));
+document.addEventListener('DOMContentLoaded', bindButtons);
+
+document.addEventListener('DOMContentLoaded', populateTable(1));
+
+/* delete row function */
+function deleteRow(id) {
+
+    console.log("delete id at: ", id);
+    var row = document.getElementById(id);
+    console.log("row: ", row.nodeName);
+    //rowActual = row.parentNode.nodeName;
+    //console.log("rowActual: ", rowActual);
+    row.parentNode.removeChild(row);
+    var payload = {	id };
 
 
-function bindButtons(event) {
-    alert("Loaded buttons");
+    var deleteRequest = new XMLHttpRequest();
 
-    viewLog(event);
-    document.getElementById('wSubmit').addEventListener('click', function(event) {
-        alert("clicked");
-        addWorkout(event);
-        viewLog(event);
+    deleteRequest.open("POST", "http://localhost:3009/delete-row", true); // change address
+    deleteRequest.setRequestHeader('Content-Type', 'application/json');
+    deleteRequest.addEventListener('load', function(event){
+        // does this even do anything?
     });
-}
 
-
-function addWorkout(event) {
-    //Base URL for 'insert' request
-    var url = 'http://52.24.243.214:3000/insert?';
-
-    //Get workout Name
-    var name = document.getElementById('wName').value;
-    console.log("Name: " + name);
-    if (name === '') {
-        name = undefined;
-    }
-    else {
-        // Add workout if not blank
-        url = url + 'name=' + name + '&';
-    }
-    console.log("Name after: " + name);
-
-    //Get workout Reps
-    var reps = document.getElementById('wReps').value;
-    console.log("Reps: " + reps);
-    if (reps === '') {
-        reps = undefined;
-
-    }
-    else {
-        // Add reps if not blank
-        url = url + 'reps=' + reps + '&';
-    }
-    console.log("Reps after: " + reps);
-
-    //Get workout weight
-    var weight = document.getElementById('wWeight').value;
-    console.log("Weight: " + weight);
-    if (weight === '') {
-        weight = undefined;
-    }
-    else {
-        // Add weight if not blank
-        url = url + 'weight=' + weight + '&';
-    }
-    console.log("Weight after: " + weight);
-
-    //Get workout date
-    var date = document.getElementById('wDate').value;
-    console.log("Date before: " + date);
-    if (date === '') {
-        date = undefined;
-    }
-    else {
-        // Add date if not blank
-        url = url + 'date=' + date + '&';
-    }
-    console.log("Date after: " + date);
-
-    //Get workout units (pound or kilogram)
-    var lbs = document.getElementById('wlbs').checked;
-    var kgs = document.getElementById('wkgs').checked;
-    console.log("Pounds before: " + lbs);
-    if (lbs === true) {
-        // Add workout in pounds
-        console.log("in pounds");
-        lbs = 1;
-        url = url + 'lbs=' + lbs;
-    }
-    else if (kgs === true ) {
-        // Add workout in kilograms
-        console.log("in kgs");
-        lbs = 0;
-        url = url + 'lbs=' + lbs;
-    }
-    else {
-        console.log("unit not selected");
-        lbs = undefined;
-    }
-    console.log("Pounds after: " + lbs);
-
-    console.log("Url: " + url);
-
-    var insert = new XMLHttpRequest();
-    insert.open('GET', url, true);
-
-    insert.addEventListener('load', function() {
-        if(insert.status >= 200 && insert.status < 400) {
-            console.log("Insertion successful");
-        }
-        else {
-            console.log("Error in network request: " + insert.statusText);
-        }
-    });
-    insert.send(null);
+    deleteRequest.send(JSON.stringify(payload));
     event.preventDefault();
+};
 
-
-
+/*
+This function creates buttons for the workout log table.
+param:
+	workoutObject: response from server.
+	count: current column
+	curRow: current Row
+	nameButton: string that names a button
+	declareAction: javascript (passed in as a string) to set buttons
+	action on a click
+*/
+function createButton(workoutObject, count, curRow ,nameButton, declareAction){
+    var cellButton = document.createElement('td');
+    var aButton = document.createElement('button');
+    aButton.class = "button-primary";
+    //deleteButton.style = "marigin-bottom:0rem";
+    aButton.id = workoutObject[count].id;
+    aButton.textContent = nameButton;
+    aButton.setAttribute("onclick", declareAction);
+    curRow.appendChild(cellButton.appendChild(aButton));
 }
 
-function viewLog(event){
 
-    var req = new XMLHttpRequest();
-    req.open('GET', 'http://52.24.243.214:3000/view', true);
+function unitType(workoutObject, count, cell, colCount){
+    if (workoutObject[count].lbs == 1 && colCount == 6){
+        cell.textContent = "lbs";
+    } else if (workoutObject[count].lbs == 0 && colCount == 6) {
+        cell.textContent = "kgs";
+    }
+}
+/*
+	think about refactoring how population of
+	a table works
+	Populates table and checks for errors
+	popType = 1 populate whole table
+	popType = 2 add one row
+*/
+function populateTable(popType) {
+    var reqInitial = new XMLHttpRequest();
+    reqInitial.open("GET", "http://localhost:3009/select-all", true); //change address
+    reqInitial.setRequestHeader('Content-Type', 'application/json');
+    reqInitial.addEventListener('load', function(event){
+        if(reqInitial.status >= 200 && reqInitial.status < 400){
+            var responseInitial = JSON.parse(reqInitial.responseText);
+            var workoutObject = responseInitial.workouts;
 
-    req.addEventListener('load', function() {
-        if(req.status >= 200 && req.status < 400){
-            var response = JSON.parse(req.responseText);
-            console.log(response);
+            //populate table initial
+            var workoutObject = responseInitial; // workout server response
+            console.log("length of workout object", workoutObject.length);
 
+            console.log("objects inside", workoutObject);
 
-            var removeMe = document.getElementById('tbody');
-            if (removeMe != null) {
-                var parent = removeMe.parentNode;
-                parent.removeChild(removeMe);
-            }
+            // Set starting value for populate table loop
+            if (popType == 1)
+                var start = 0;
+            else if (popType == 2)
+                var start = workoutObject.length - 1;
 
-            var tb = document.getElementById('tableLog');
-            var tbody = document.createElement('tbody');
-            tbody.setAttribute("id", "tbody");
+            // Reference variable for the entire table.
+            var tableRef = document.getElementById("ex-table").getElementsByTagName("tbody")[0];
 
+            //debuggin
+            var count1 =0;
+            var count2 = 0;
+            //loop to populate table
+            var table = document.getElementById("table-body");
+            for (var i = start; i<workoutObject.length; i++){
+                var isId = true; // used id each row of the table. hidden
+                var colCount = 1;
 
-            tb.appendChild(tbody);
+                console.log("row iterations: ", count1);
+                if(workoutObject.length > 0){
+                    // Insert a row in tableRef at last row.
+                    var newRow = tableRef.insertRow(tableRef.rows.length);
+                    newRow.id = workoutObject[i].id;
+                }
+                // this loop populates a row
+                for (var val in workoutObject[i]){
+                    console.log(workoutObject[i][val]);
+                    var newCell = document.createElement('td');
+                    newCell.textContent = workoutObject[i][val];
 
-            for (var i in response) {
+                    //units is on 6th iteration
+                    unitType(workoutObject, i, newCell, colCount);
 
-                var newRow = document.createElement('tr');
-                var e1 = document.createElement('td');
-                var e2 = document.createElement('td');
-                var e3 = document.createElement('td');
-                var e4 = document.createElement('td');
-                var e5 = document.createElement('td');
-                var e6 = document.createElement('td');
+                    if(isId == true){
+                        newCell.style.display="none"
+                        isId = false;
+                    }
+                    newRow.appendChild(newCell);
+                    colCount++; // keeps track on whether to turn 0 or 1 into lbs or kgs
+                } // end inner loop
 
-                var nameText = document.createTextNode(response[i].name);
-                var repsText = document.createTextNode(response[i].reps);
-                var weightText = document.createTextNode(response[i].weight);
-                var dateText = document.createTextNode(response[i].date);
-                var lbsText = document.createTextNode(response[i].lbs);
-
-
-                var editButton = document.createElement('input');
-                editButton.setAttribute("type", "button");
-                editButton.setAttribute("value", "edit");
-
-                var deleteButton = document.createElement('input');
-                deleteButton.setAttribute("type", "button");
-                deleteButton.setAttribute("value", "delete");
-                deleteButton.setAttribute("onclick", "deleteRow");
-
-                var hidden = document.createElement('form');
-                hidden.setAttribute("type", "hidden");
-                hidden.setAttribute("value", response[i].id);
-
-                var hidden2 = document.createElement('form');
-                hidden2.setAttribute("type", "hidden");
-                hidden2.setAttribute("value", response[i].id);
-
-                deleteButton.setAttribute("onclick", "deleteRow(this)");
-                editButton.setAttribute("onclick", "editRow(this)");
-                editButton.appendChild(hidden2);
-                deleteButton.appendChild(hidden);
-
-                // Append new row information to existing table
-                tbody.appendChild(newRow);
-
-                newRow.appendChild(e1);
-                e1.appendChild(nameText);
-
-                newRow.appendChild(e2);
-                e2.appendChild(repsText);
-
-                newRow.appendChild(e3);
-                e3.appendChild(weightText);
-
-                newRow.appendChild(e4);
-                e4.appendChild(dateText);
-
-                newRow.appendChild(e5);
-                e5.appendChild(lbsText);
-
-                newRow.appendChild(e6);
-                e6.appendChild(editButton);
-                e6.appendChild(deleteButton);
-
-
-                console.log("Name " + response[i].name + "\n");
-                console.log("Reps " + response[i].reps + "\n");
-                console.log("Weight " + response[i].weight + "\n");
-                console.log("Date " + response[i].date + "\n");
-                console.log("Lbs " + response[i].lbs + "\n");
-
-
-
-
-            }
-
-
-
-        }
-        else {
-            console.log("Error in network request: " + req.statusText);
-        }
+                createButton(workoutObject, i, newRow,
+                    "delete", "deleteRow(this.id)");
+                createButton(workoutObject, i, newRow,
+                    "update", "window.location='update-row?id='+this.id");
+            } // end outer loop
+        } else
+            console.log("Error in network request: " + reqInitial.statusText);
     });
-    req.send(null);
-    //event.preventDefault();
+    reqInitial.send(null);
 }
 
-function deleteRow(element) {
+/* binds event listeners to buttons*/
+function bindButtons(){
 
-    var item = element.firstChild;
-    var idVal = item.getAttribute("value");
+    /*submit data button*/
+    if (document == null){
+        console.log("document is null");
+    }
 
-    console.log("Item with id " + idVal + " will be deleted");
+    document.getElementById('submit-data').addEventListener('click', function(event){
+        var req = new XMLHttpRequest();
+        var payload = {
+            name: null,
+            reps: null,
+            weight: null,
+            date: null,
+            lbs: null
+        };
+        var tableRef = document.getElementById("ex-table").getElementsByTagName("tbody")[0];
 
-    var url = 'http://52.24.243.214:3000/delete?id=' + idVal;
-    var req = new XMLHttpRequest();
-
-    req.open('GET', url, true);
-
-    req.addEventListener('load', function(){
-        if(req.status >= 200 && req.status < 400){
-            console.log("Deletion successful");
-        }
-        else {
-            console.log("Server Error: " + req.statusText);
-        }
-    });
-    req.send(null);
-
-    viewLog();
-
-}
-
-function editRow(element){
-
-    var item = element.firstChild;
-    var idVal = item.getAttribute("value");
-
-    console.log("Item with id " + idVal + " will be edited");
-
-    // Get row information prior to edit
-    var url =  'http://52.24.243.214:3000/one' + "?id=" + idVal;
-    console.log("Edit url is: " + url);
-
-    var req = new XMLHttpRequest();
-    req.open('GET', url , true);
-
-    req.addEventListener('load', function() {
-        if(req.status >= 200 && req.status < 400){
-            console.log("View for edit successful");
-            var response = JSON.parse(req.responseText);
-            console.log(response);
-
+        // lbs return true, kg return false
+        if (document.getElementById('lbs-true').checked == 'on'){
+            payload.lbs = true;
+        } else {
+            payload.lbs = false;
         }
 
+        //removes hyphens and spaces from date
+        var date = payload.date = document.getElementById('ex-date').value;
+        var dateParsed = date.replace(/-|\s/g,"");
 
+        // set values of each property in payload
+        payload.name = document.getElementById('ex-name').value;
+        payload.reps = document.getElementById('ex-reps').value;
+        payload.weight = document.getElementById('ex-weight').value;
+        payload.date = dateParsed;
+        payload.lbs = document.getElementById('lbs-true').checked;
 
+        req.open("POST", "http://localhost:3009/insert", true); // on AWS change to 52.36.142.254
 
-        else {
-            console.log("Error in network request: " + req.statusText);
-        }
-    });
-    req.send(null);
-    //event.preventDefault();
+        req.setRequestHeader('Content-Type', 'application/json');
+
+        req.addEventListener('load', function() {
+            populateTable(2);
+        });
+
+        req.send(JSON.stringify(payload));
+        event.preventDefault();
+    }); /*end submit data button*/
 }

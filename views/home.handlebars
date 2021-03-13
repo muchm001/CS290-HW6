@@ -1,3 +1,78 @@
+<div class ="container">
 
-<h1>MySQL Results:</h1>
-<p>{{results}}</p>
+    <h1>Workout Tracker App</h1>
+
+    <h5>Insert New Workout</h5>
+    <form>
+        <div class="row">
+            <div class="eight columns">
+                <label>Exercise Name</label>
+                <input class="u-full-width" type="text" placeholder="Squats" id="ex-name">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="eight columns">
+                <label>Date Performed</label>
+                <input class="u-full-width" type="date" placeholder="2016-05-01" id="ex-date">
+            </div>
+        </div>
+        <div class="row">
+            <div class="three columns">
+                <label>Reps</label>
+                <input class="u-full-width" type="number" min="0" step="1" placeholder="5" id="ex-reps"/>
+            </div>
+            <div class="three columns">
+                <label>Weight</label>
+                <input class="u-full-width" type="number" min="0" step="1" placeholder="100" id="ex-weight">
+            </div>
+            <div class="three columns">
+                <label>Units</label>
+                <label class="weight-type-lbs">
+                    <input type="radio" name="units" id="lbs-true" data-bind="checked:IsChecked, checkedValue: true"/>
+                    <span class="label-body">lbs</span>
+                </label>
+                <label class="weight-type-kgs">
+                    <input type="radio" name="units" id="kgs-true"/>
+                    <span class="label-body">kgs</span>
+                </label>
+            </div>
+            <div class="row" style="display:none;">
+                <div class="eight columns">
+                    <label>ID</label>
+                    <input class="u-full-width" type="text" value="{{this.id}}" id="ex-id">
+                </div>
+            </div>
+        </div>
+
+        <input class="button-primary" type="submit" value="Submit" id="submit-data">
+    </form>
+
+    <h5 style="margin-bottom: 0rem">Workout Log</h5>
+    <table class="u-full-width" id="ex-table">
+        <thead>
+        <tr>
+            <th style="display:none;">Exercise ID HIDE LATER</th>
+            <th>Exercise Name</th>
+            <th>Repetitions</th>
+            <th>Weight</th>
+            <th>Date</th>
+            <th>Units</th>
+        </tr>
+        </thead>
+
+        <!--Dynamic data starts here -->
+        <tbody id="table-body">
+        {{#each workouts}}
+            <tr>
+                <td>{{this.id}}</td>
+                <td>{{this.name}}</td>
+                <td>{{this.reps}}</td>
+                <td>{{this.weight}}</td>
+                <td>{{this.lbs}}</td>
+                <td>{{this.date}}</td>
+            </tr>
+        {{/each}}
+        </tbody>
+    </table>
+</div>

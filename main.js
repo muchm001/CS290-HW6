@@ -1,136 +1,22 @@
 var express = require('express');
-var mysql = require('./dbcon.js');
-var bodyParser = require('body-parser'); //to handle post requests
 
 var app = express();
 var handlebars = require('express-handlebars').create({defaultLayout:'main'});
+var bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({extended:false}));
+app.use(bodyParser.json());
+
+var mysql = require('./dbcon.js');
+
+app.use(express.static('public'));
 
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
 app.set('port', 22420);
 
-app.use(express.static('public'));
-
-// allows parsing of requests sent to this server from a client
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(bodyParser.json());
-
-/* Handles Data sent from client and inserts in db */
-app.post('/insert',function(req,res,next){
-  var context = {};
-  var postParameters = [];
-
-  postParameters.push(req.body)
-
-  mysql.pool.query('INSERT INTO workouts SET ?', postParameters, function(err,result){
-    if(err){
-      next(err);
-      return;
-    }
-
-    mysql.pool.query('SELECT * FROM workouts ORDER BY id ASC LIMIT 1',function(err,rows,fields){
-      if(err){
-        next(err);
-        return;
-      }
-
-      // save rows in an array
-      context.workouts = rows[0];
-      console.log("db sending back to server", context);
-      res.send(JSON.stringify(context));
-    });
-  });
-});
-
-app.get('/',function(req,res,next){
-
-  var context = {};
-  var exerciseList = [];
-  // see if this is messing things up later..
-  mysql.pool.query('SELECT * FROM workouts ORDER BY id DESC LIMIT 1',function(err,rows,fields){
-    if(err){
-      next(err);
-      return;
-    }
-
-    // save rows in an array
-    context.workouts = rows[0];
-    res.render('home');
-  });
-});
-
-// route to select all from table
-app.get('/select-all', function(req,res,next){
-  mysql.pool.query('SELECT * FROM workouts',function(err,rows,fields){
-    if(err){
-      next(err);
-      return;
-    }
-    res.send(JSON.stringify(rows));
-  });
-});
-
-app.get('/update-row', function(req,res,next){
-
-  var context = {};
-
-  console.log(req.query.id);
-  console.log("get exercise with this id", req.query.id)
-  mysql.pool.query('SELECT * FROM workouts WHERE id=?', [req.query.id],
-      function(err,rows,fields){
-        if(err){
-          next(err);
-          return;
-        }
-        console.log("current row", rows[0]);
-        context = rows[0];
-        console.log("returned data from update2", context);
-        res.render('update-row', context);
-      })
-});
-
-app.get('/testForm', function(req,res,next){
-  res.render('testForm');
-});
-
-app.post('/edit-row', function(request, response){
-  console.log("query recieved", request.body.name);
-  var context = {};
-  mysql.pool.query('UPDATE `workouts` SET name=?, reps=?, weight=?, date=?, lbs=? WHERE id=?', [request.body.name, request.body.reps, request.body.weight,
-        request.body.date, request.body.lbs, request.body.id],
-      function(err,result){
-        if(err){
-          next(err);
-          return;
-        }
-        console.log("result", result);
-        response.render('home');
-      });
-});
-
-app.post('/delete-row', function(req,res,next ){
-
-  console.log("delete row with this id", req.body.id);
-  mysql.pool.query('DELETE FROM `workouts` WHERE id =?', [req.body.id], function(err, result){
-    if(err){
-      next(err);
-      return;
-    }
-    mysql.pool.query('SELECT * FROM `workouts`', function(err, rows, fields){
-      if(err){
-        next(err);
-        return;
-      }
-      console.log("after deletion", rows);
-    });
-  });
-});
-
-/*Link to easily reset table*/
 app.get('/reset-table',function(req,res,next){
   var context = {};
-  //replace your connection pool with the your variable containing the connection pool
-  mysql.pool.query("DROP TABLE IF EXISTS workouts", function(err){
+  mysql.pool.query("DROP TABLE IF EXISTS workouts", function(err){ //replace your connection pool with the your variable containing the connection pool
     var createString = "CREATE TABLE workouts("+
         "id INT PRIMARY KEY AUTO_INCREMENT,"+
         "name VARCHAR(255) NOT NULL,"+
@@ -139,9 +25,151 @@ app.get('/reset-table',function(req,res,next){
         "date DATE,"+
         "lbs BOOLEAN)";
     mysql.pool.query(createString, function(err){
+      context.results = "Table reset";
       res.render('home',context);
     })
   });
+});
+
+app.get('/', function(req, res, next){
+  var context = {};
+
+  //console.log("GET Request Received By Server!");
+
+  if(req.query.generateTable){  // This will handle get request sent from client side after page first rendered
+
+    mysql.pool.query('SELECT id, name, reps, weight, date_format(date,"%m-%d-%Y") AS date, lbs FROM workouts', function(err, rows, fields){
+      if (err){
+        next(err);
+        return;
+      }
+
+      res.send(JSON.stringify(rows));
+
+    });
+
+  }
+
+  else{
+    res.render('home');
+  }
+
+});
+
+app.post('/', function(req,res,next){
+  var context = {};
+  //context.results = "You've sent a POST request";
+
+  //console.log("POST Request Received By Server!");
+  //console.log(req.body);
+
+  if(req.body.addExerciseButton){   // We came in from the add exercise form so need to add a row to the database table
+                                    // if user didn't enter a first name, we don't want to add it to the table
+    if(req.body.name == ""){
+      var sendError = {badInput: true};
+      res.send(JSON.stringify(sendError));
+      return;
+    }
+
+    mysql.pool.query('INSERT INTO workouts (name, reps, weight, date, lbs) VALUES (?,?,?,?,?)', [req.body.name, req.body.reps, req.body.weight, req.body.date, req.body.lbs], function(err, result){
+      if (err) {
+        next(err);
+        return;
+      }
+
+      else {
+        mysql.pool.query('SELECT id, name, reps, weight, date_format(date,"%m-%d-%Y") AS date, lbs FROM workouts', function (err, rows, fields) {
+          if (err) {
+            next(err);
+            return;
+          }
+
+          else {
+            res.send(JSON.stringify(rows));
+          }
+        });
+      }
+
+    });
+  }
+
+  else if(req.body.deleteButton){     // We're coming in from the delete button so need to remove a row
+    mysql.pool.query('DELETE FROM workouts WHERE id = ?', [req.body.id], function(err, result) {
+      if (err) {
+        next(err);
+        return;
+      }
+
+      else {
+        mysql.pool.query('SELECT id, name, reps, weight, date_format(date,"%m-%d-%Y") AS date, lbs FROM workouts', function (err, rows, fields) {
+          if (err) {
+            next(err);
+            return;
+          }
+
+          else {
+            res.send(JSON.stringify(rows));
+          }
+
+        });
+      }
+
+    });
+  }
+
+  else if(req.body.updateButton) {      // User entered from the edit button. need to alter current page to show update form
+
+    // Select all info in the row user wants to update
+    mysql.pool.query('SELECT * FROM workouts WHERE id = ?', [req.body.id], function(err, rows, fields) {
+      if (err) {
+        next(err);
+        return;
+      }
+
+      else {
+        context.updateForm = true;
+        context.id = rows[0].id;
+        context.name = rows[0].name;
+        context.reps = rows[0].reps;
+        context.weight = rows[0].weight;
+        context.date = rows[0].date;
+
+        if(rows[0].lbs == 1) {
+          context.lbsUsed = true;
+        }
+
+        res.render('home', context);
+      }
+
+    });
+
+  }
+
+  else if(req.body.updateExerciseButton) {      // user has submitted the update exercise form
+
+    // if user deleted the exercise name, this should not be allowed. Display an error message
+
+    if(req.body.name == ""){
+      context.errorResults = "Update FAILED: All rows must contain at least an exercise name. Try again!";
+      res.render('home',context);
+      return;
+    }
+
+    mysql.pool.query('UPDATE workouts SET name = ?, reps = ?, weight = ?, date = ?, lbs = ? WHERE id = ?', [req.body.name, req.body.reps, req.body.weight, req.body.date, req.body.lbs, req.body.id], function(err, result) {
+      if(err) {
+        next(err);
+        return;
+      }
+
+      else {
+        res.render('home');
+
+      }
+
+    });
+  }
+
+
 });
 
 app.use(function(req,res){
@@ -157,5 +185,5 @@ app.use(function(err, req, res, next){
 });
 
 app.listen(app.get('port'), function(){
-  console.log('Express started on http://localhost:' + app.get('port') + '; press Ctrl-C to terminate.');
+  console.log('Express started on http://flip2.engr.oregonstate.edu:' + app.get('port') + '; press Ctrl-C to terminate.');
 });

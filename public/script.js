@@ -190,7 +190,7 @@ document.getElementById('addExerciseButton').addEventListener("click", function(
 
 
 
-    req.open("POST", "http://flip2.engr.oregonstate.edu:5840/", true);
+    req.open("POST", "http://flip2.engr.oregonstate.edu:22420/", true);
     req.setRequestHeader('Content-Type', 'application/json');
     req.addEventListener("load", function(){
         if (req.status >= 200 && req.status < 400) {

@@ -1,5 +1,3 @@
-
-
 document.addEventListener('DOMContentLoaded', bindButtons(event));
 
 

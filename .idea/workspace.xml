@@ -2,7 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="357c6c71-3e19-4ef5-af36-eda3503b11e2" name="Default Changelist" comment="ok">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/main.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/home.handlebars" beforeDir="false" afterPath="$PROJECT_DIR$/views/home.handlebars" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/layouts/main.handlebars" beforeDir="false" afterPath="$PROJECT_DIR$/views/layouts/main.handlebars" afterDir="false" />
     </list>
     <list id="15bbd1fc-e9f1-45a9-b769-eb282f258189" name="New changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -61,7 +65,7 @@
       <workItem from="1615507621876" duration="6852000" />
       <workItem from="1615585428279" duration="1643000" />
       <workItem from="1615587541424" duration="37000" />
-      <workItem from="1615590620171" duration="2808000" />
+      <workItem from="1615590620171" duration="3494000" />
     </task>
     <task id="LOCAL-00001" summary="ok">
       <created>1615577806908</created>
@@ -154,7 +158,14 @@
       <option name="project" value="LOCAL" />
       <updated>1615595255064</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="ok">
+      <created>1615595293441</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1615595293441</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

@@ -1,5 +1,5 @@
 var express = require('express');
-var mysql = require('./dbcred.js');
+var mysql = require('./dbcon.js');
 var bodyParser = require('body-parser'); //to handle post requests
 
 var app = express();
@@ -7,7 +7,7 @@ var handlebars = require('express-handlebars').create({defaultLayout:'main'});
 
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
-app.set('port', 3009);
+app.set('port', 22420);
 
 app.use(express.static('public'));
 

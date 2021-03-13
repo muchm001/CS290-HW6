@@ -25,9 +25,9 @@ var pool = mysql.createPool({
 });
 
 var con = mysql.createConnection({
-  host: 'classmysql.engr.oregonstate.edu',
-  user: 'cs290_latimerh',
-  password: 'Chickens-123'
+  host : 'classmysql.engr.oregonstate.edu',
+  user : 'cs290_uchmanom',
+  password : '8326',
 });
 
 con.connect(function(err) {

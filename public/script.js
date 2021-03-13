@@ -1,267 +1,278 @@
-// Michael Uchmanowicz
-// Database Interactions and UI
 
-function deleteRow(id){
-  console.log("Row with id# " + id + " will be deleted");
+
+document.addEventListener('DOMContentLoaded', bindButtons(event));
+
+
+function bindButtons(event) {
+    alert("Loaded buttons");
+
+    viewLog(event);
+    document.getElementById('wSubmit').addEventListener('click', function(event) {
+        alert("clicked");
+        addWorkout(event);
+        viewLog(event);
+    });
 }
 
-function displayTable(newData){
-  if(document.getElementById("dataTable")){
-        document.getElementById("tableToBeConstructed").removeChild(document.getElementById("dataTable"));
-      }
-      
-      // Construct a new table on the HTML page using returned data from database
-      
-      var newTable = document.createElement("table");
-      newTable.id = "dataTable";
-      newTable.style.border = "solid";
-      newTable.style.borderWidth = "1px";
-      
-      var headRow = document.createElement("tr");
-      
-      var nameHeader = document.createElement("th");
-      nameHeader.textContent = "Exercise Name";
-      nameHeader.style.border = "solid";
-      nameHeader.style.borderWidth = "1px";
-      nameHeader.style.textAlign = "center";
-      headRow.appendChild(nameHeader);
-      
-      var repsHeader = document.createElement("th");
-      repsHeader.textContent = "Number of Reps";
-      repsHeader.style.border = "solid";
-      repsHeader.style.borderWidth = "1px";
-      repsHeader.style.textAlign = "center";
-      headRow.appendChild(repsHeader);
-      
-      var weightHeader = document.createElement("th");
-      weightHeader.textContent = "Weight Used";
-      weightHeader.style.border = "solid";
-      weightHeader.style.borderWidth = "1px";
-      weightHeader.style.textAlign = "center";
-      headRow.appendChild(weightHeader);
-      
-      var dateHeader = document.createElement("th");
-      dateHeader.textContent = "Date Performed";
-      dateHeader.style.border = "solid";
-      dateHeader.style.borderWidth = "1px";
-      dateHeader.style.textAlign = "center";
-      headRow.appendChild(dateHeader);
-      
-      var lbsHeader = document.createElement("th");
-      lbsHeader.textContent = "Unit";
-      lbsHeader.style.border = "solid";
-      lbsHeader.style.borderWidth = "1px";
-      lbsHeader.style.textAlign = "center";
-      headRow.appendChild(lbsHeader);
-      
-      
-      newTable.appendChild(headRow);
-      
-      
-      // Now populate the table with the results returned from the database
-      for(var index = 0; index < newData.length; index++){
-        var newRow = document.createElement("tr");
-        
-        var nameCell = document.createElement("td");
-        nameCell.textContent = newData[index].name;
-        nameCell.style.border = "solid";
-        nameCell.style.borderWidth = "1px";
-        nameCell.style.textAlign = "center";
-        newRow.appendChild(nameCell);
-        
-        var repsCell = document.createElement("td");
-        repsCell.textContent = newData[index].reps;
-        repsCell.style.border = "solid";
-        repsCell.style.borderWidth = "1px";
-        repsCell.style.textAlign = "center";
-        newRow.appendChild(repsCell);
-        
-        var weightCell = document.createElement("td");
-        weightCell.textContent = newData[index].weight;
-        weightCell.style.border = "solid";
-        weightCell.style.borderWidth = "1px";
-        weightCell.style.textAlign = "center";
-        newRow.appendChild(weightCell);
-        
-        var dateCell = document.createElement("td");
-        dateCell.textContent = newData[index].date;
-        dateCell.style.border = "solid";
-        dateCell.style.borderWidth = "1px";
-        dateCell.style.textAlign = "center";
-        newRow.appendChild(dateCell);
-        
-        var lbsCell = document.createElement("td");
-        if(newData[index].lbs == 1) {
-          lbsCell.textContent = "lbs";
+
+function addWorkout(event) {
+    //Base URL for 'insert' request
+    var url = 'http://52.24.243.214:3000/insert?';
+
+    //Get workout Name
+    var name = document.getElementById('wName').value;
+    console.log("Name: " + name);
+    if (name === '') {
+        name = undefined;
+    }
+    else {
+        // Add workout if not blank
+        url = url + 'name=' + name + '&';
+    }
+    console.log("Name after: " + name);
+
+    //Get workout Reps
+    var reps = document.getElementById('wReps').value;
+    console.log("Reps: " + reps);
+    if (reps === '') {
+        reps = undefined;
+
+    }
+    else {
+        // Add reps if not blank
+        url = url + 'reps=' + reps + '&';
+    }
+    console.log("Reps after: " + reps);
+
+    //Get workout weight
+    var weight = document.getElementById('wWeight').value;
+    console.log("Weight: " + weight);
+    if (weight === '') {
+        weight = undefined;
+    }
+    else {
+        // Add weight if not blank
+        url = url + 'weight=' + weight + '&';
+    }
+    console.log("Weight after: " + weight);
+
+    //Get workout date
+    var date = document.getElementById('wDate').value;
+    console.log("Date before: " + date);
+    if (date === '') {
+        date = undefined;
+    }
+    else {
+        // Add date if not blank
+        url = url + 'date=' + date + '&';
+    }
+    console.log("Date after: " + date);
+
+    //Get workout units (pound or kilogram)
+    var lbs = document.getElementById('wlbs').checked;
+    var kgs = document.getElementById('wkgs').checked;
+    console.log("Pounds before: " + lbs);
+    if (lbs === true) {
+        // Add workout in pounds
+        console.log("in pounds");
+        lbs = 1;
+        url = url + 'lbs=' + lbs;
+    }
+    else if (kgs === true ) {
+        // Add workout in kilograms
+        console.log("in kgs");
+        lbs = 0;
+        url = url + 'lbs=' + lbs;
+    }
+    else {
+        console.log("unit not selected");
+        lbs = undefined;
+    }
+    console.log("Pounds after: " + lbs);
+
+    console.log("Url: " + url);
+
+    var insert = new XMLHttpRequest();
+    insert.open('GET', url, true);
+
+    insert.addEventListener('load', function() {
+        if(insert.status >= 200 && insert.status < 400) {
+            console.log("Insertion successful");
         }
-        
         else {
-          lbsCell.textContent = "kg";
+            console.log("Error in network request: " + insert.statusText);
         }
-        
-        lbsCell.style.border = "solid";
-        lbsCell.style.borderWidth = "1px";
-        lbsCell.style.textAlign = "center";
-        newRow.appendChild(lbsCell);
-        
-        // Store the id for the row in a hidden input
-        
-        var deleteContainer = document.createElement("td");
-        var deleteForm = document.createElement("form");
-        deleteForm.method="post";                                   // Need to specify the form's action on next line
-        deleteForm.action="";
-  
-        var hiddenDeleteId = document.createElement("input");
-        hiddenDeleteId.type="hidden";
-        hiddenDeleteId.className="hiddenId";                  // Used to determine which row will be deleted
-        hiddenDeleteId.name="id";
-        hiddenDeleteId.value = newData[index].id;   // Store the id within the form
-        deleteForm.appendChild(hiddenDeleteId);
-        
-        // Form submits only the id of the row to the given page
-        
-        var deleteButton = document.createElement("input");
-        deleteButton.type="submit";                             
-        deleteButton.name="deleteButton";
-        deleteButton.value="Delete";
-        deleteButton.className="deleteButton";
-        deleteForm.appendChild(deleteButton);
-        deleteContainer.appendChild(deleteForm);
-        newRow.appendChild(deleteContainer);
-        
-        var updateContainer = document.createElement("td");     // Code to create an edit button that submits row id to server
-        var updateForm = document.createElement("form");
-        updateForm.method = "post";
-        updateForm.action = "";
-        var hiddenUpdateId = document.createElement("input");
-        hiddenUpdateId.type = "hidden";
-        hiddenUpdateId.className = "updateId";
-        hiddenUpdateId.name = "id";
-        hiddenUpdateId.value = newData[index].id;     // Store the row id within the form
-        updateForm.appendChild(hiddenUpdateId);
-        
-        var updateButton = document.createElement("input");
-        updateButton.type = "submit";
-        updateButton.name = "updateButton";
-        updateButton.value = "Edit";
-        updateButton.className = "updateButton";
-        updateForm.appendChild(updateButton);
-        updateContainer.appendChild(updateForm);
-        newRow.appendChild(updateContainer);
-                
-        
-        newTable.appendChild(newRow);
-      }
-      
-      document.getElementById("tableToBeConstructed").appendChild(newTable);
-};
-
-document.addEventListener("DOMContentLoaded",function(){
-  var req = new XMLHttpRequest();
-  req.open("GET", "http://flip2.engr.oregonstate.edu:5840/?generateTable=1", true);
-  req.addEventListener("load", function(){
-    if (req.status >= 200 && req.status < 400) {
-      //console.log("GET Request Worked");
-      var dataTable = JSON.parse(req.responseText);
-      displayTable(dataTable);
-      bindDeleteButtons();
-    }
-    
-    else {
-      console.log("Get Request Failed");
-    }
-  });
-  
-  req.send(null);
-  
-});
+    });
+    insert.send(null);
+    event.preventDefault();
 
 
 
-document.getElementById('addExerciseButton').addEventListener("click", function(event){
-  //console.log("POST Event Listener Simple Method Worked!");
-  var req = new XMLHttpRequest();
-  // Get all of the user input information
-  
-  var dataToSend = {};
-    dataToSend.name = document.getElementById('name').value;
-    dataToSend.reps = document.getElementById('reps').value;
-    dataToSend.weight = document.getElementById('weight').value;
-    dataToSend.date = document.getElementById('date').value;
-    dataToSend.lbs = document.getElementById('lbs').value;
-    dataToSend.addExerciseButton = document.getElementById('addExerciseButton').value;
-  
-  
-  
-  req.open("POST", "http://flip2.engr.oregonstate.edu:5840/", true);
-  req.setRequestHeader('Content-Type', 'application/json');
-  req.addEventListener("load", function(){
-    if (req.status >= 200 && req.status < 400) {
-      //console.log("POST Request Worked");
-      //console.log(req.responseText);
-      
-      
-      var newData = JSON.parse(req.responseText);
-      
-      // if user forgot to include the name of the exercise an error will occur
-      
-      if(newData.badInput){
-        alert("You need to input the name of the exercise to add a row to the table. Try again.");
-      }
-      
-      else{
-        displayTable(newData);
-        bindDeleteButtons();
-      }
-      
-    }
-    
-    else {
-      console.log("POST Request Failed");
-    }
-  });
-  
-  req.send(JSON.stringify(dataToSend));
-  
-  event.preventDefault();
-});
+}
+
+function viewLog(event){
+
+    var req = new XMLHttpRequest();
+    req.open('GET', 'http://52.24.243.214:3000/view', true);
+
+    req.addEventListener('load', function() {
+        if(req.status >= 200 && req.status < 400){
+            var response = JSON.parse(req.responseText);
+            console.log(response);
 
 
-function bindDeleteButtons(){
-  //console.log("Bind delete buttons was started");
-  var deleteButtonList = document.getElementsByClassName("deleteButton"); // List of all form submit buttons that will send id to server
-  var hiddenIdList = document.getElementsByClassName("hiddenId");         // List of all hidden inputs that contain id as value
-  
-  
-  for (var index = 0; index < deleteButtonList.length; index++){
-    function closureWrapper(index) {
-      deleteButtonList[index].addEventListener("click", function(event){
-      
-        var req = new XMLHttpRequest();
-        var dataToSend = {};
-        req.open("POST", "http://flip2.engr.oregonstate.edu:5840/", true);
-        req.setRequestHeader('Content-Type', 'application/json');
-        
-        dataToSend.id = hiddenIdList[index].value;
-        dataToSend.deleteButton = "Delete";
-        
-        //console.log(index);
-        
-        req.addEventListener('load', function(){
-          if(req.status >= 200 && req.status < 400){
-            var newData = JSON.parse(req.responseText);
-            displayTable(newData);
-            bindDeleteButtons();
-          }
-          
-          else {
+            var removeMe = document.getElementById('tbody');
+            if (removeMe != null) {
+                var parent = removeMe.parentNode;
+                parent.removeChild(removeMe);
+            }
+
+            var tb = document.getElementById('tableLog');
+            var tbody = document.createElement('tbody');
+            tbody.setAttribute("id", "tbody");
+
+
+            tb.appendChild(tbody);
+
+            for (var i in response) {
+
+                var newRow = document.createElement('tr');
+                var e1 = document.createElement('td');
+                var e2 = document.createElement('td');
+                var e3 = document.createElement('td');
+                var e4 = document.createElement('td');
+                var e5 = document.createElement('td');
+                var e6 = document.createElement('td');
+
+                var nameText = document.createTextNode(response[i].name);
+                var repsText = document.createTextNode(response[i].reps);
+                var weightText = document.createTextNode(response[i].weight);
+                var dateText = document.createTextNode(response[i].date);
+                var lbsText = document.createTextNode(response[i].lbs);
+
+
+                var editButton = document.createElement('input');
+                editButton.setAttribute("type", "button");
+                editButton.setAttribute("value", "edit");
+
+                var deleteButton = document.createElement('input');
+                deleteButton.setAttribute("type", "button");
+                deleteButton.setAttribute("value", "delete");
+                deleteButton.setAttribute("onclick", "deleteRow");
+
+                var hidden = document.createElement('form');
+                hidden.setAttribute("type", "hidden");
+                hidden.setAttribute("value", response[i].id);
+
+                var hidden2 = document.createElement('form');
+                hidden2.setAttribute("type", "hidden");
+                hidden2.setAttribute("value", response[i].id);
+
+                deleteButton.setAttribute("onclick", "deleteRow(this)");
+                editButton.setAttribute("onclick", "editRow(this)");
+                editButton.appendChild(hidden2);
+                deleteButton.appendChild(hidden);
+
+                // Append new row information to existing table
+                tbody.appendChild(newRow);
+
+                newRow.appendChild(e1);
+                e1.appendChild(nameText);
+
+                newRow.appendChild(e2);
+                e2.appendChild(repsText);
+
+                newRow.appendChild(e3);
+                e3.appendChild(weightText);
+
+                newRow.appendChild(e4);
+                e4.appendChild(dateText);
+
+                newRow.appendChild(e5);
+                e5.appendChild(lbsText);
+
+                newRow.appendChild(e6);
+                e6.appendChild(editButton);
+                e6.appendChild(deleteButton);
+
+
+                console.log("Name " + response[i].name + "\n");
+                console.log("Reps " + response[i].reps + "\n");
+                console.log("Weight " + response[i].weight + "\n");
+                console.log("Date " + response[i].date + "\n");
+                console.log("Lbs " + response[i].lbs + "\n");
+
+
+
+
+            }
+
+
+
+        }
+        else {
             console.log("Error in network request: " + req.statusText);
-          }
-        });
-        
-        req.send(JSON.stringify(dataToSend));
-        event.preventDefault();
-      });
-    }closureWrapper(index);    // wrapper function called here to create closure
-  };
+        }
+    });
+    req.send(null);
+    //event.preventDefault();
+}
+
+function deleteRow(element) {
+
+    var item = element.firstChild;
+    var idVal = item.getAttribute("value");
+
+    console.log("Item with id " + idVal + " will be deleted");
+
+    var url = 'http://52.24.243.214:3000/delete?id=' + idVal;
+    var req = new XMLHttpRequest();
+
+    req.open('GET', url, true);
+
+    req.addEventListener('load', function(){
+        if(req.status >= 200 && req.status < 400){
+            console.log("Deletion successful");
+        }
+        else {
+            console.log("Server Error: " + req.statusText);
+        }
+    });
+    req.send(null);
+
+    viewLog();
+
+}
+
+function editRow(element){
+
+    var item = element.firstChild;
+    var idVal = item.getAttribute("value");
+
+    console.log("Item with id " + idVal + " will be edited");
+
+    // Get row information prior to edit
+    var url =  'http://52.24.243.214:3000/one' + "?id=" + idVal;
+    console.log("Edit url is: " + url);
+
+    var req = new XMLHttpRequest();
+    req.open('GET', url , true);
+
+    req.addEventListener('load', function() {
+        if(req.status >= 200 && req.status < 400){
+            console.log("View for edit successful");
+            var response = JSON.parse(req.responseText);
+            console.log(response);
+
+        }
+
+
+
+
+        else {
+            console.log("Error in network request: " + req.statusText);
+        }
+    });
+    req.send(null);
+    //event.preventDefault();
 }

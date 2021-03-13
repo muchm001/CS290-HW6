@@ -1,11 +1,71 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Workout Tracker!</title>
-    <link rel="stylesheet" href="/styles.css">
-  </head>
-  <body>
-    {{{body}}}
-    <script src="/script.js"></script>
-  </body>
+<head>
+    <title>Workout Log</title>
+    <link rel="stylesheet" href="workout-Style.css">
+
+    <!--	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    -->
+</head>
+
+<body>
+<div id="intro">
+    <h1> Welcome to the workout tracker! </h1>
+    <p></p>
+</div>
+
+<div id="forms">
+    <h3> Enter information about the workout that you wish to enter:</h3>
+    <fieldset id="workoutInfo">
+        <legend>Add New Workout</legend>
+        <label for="wName">Workout Name:</label>
+        <input type="text" name="wName" id="wName" placeholder="Name"/>
+
+        <p></p>
+        <label for="wReps">Reps:</label>
+        <input type="number" name="wReps" id="wReps"/>
+
+        <p></p>
+        <label for="wWeight">Weight:</label>
+        <input type="number" name="wWeight" id="wWeight"/>
+        <p></p>
+        <label for="wDate">Date:</label>
+        <input type="date" name="wDate" id="wDate"/>
+        <p></p>
+        <label for="wlbs">Pounds?</label>
+        <input type="radio" name="wlbs" id="wlbs" value="Yes"/>Yes
+        <input type="radio" name="wlbs" id="wkgs" value="No"/>No<br>
+        <p></p>
+        <input type="submit" id="wSubmit"/>
+    </fieldset>
+    <p></p>
+</div>
+<p></p>
+<div id="results">
+    <h3> The current workout log: </h3>
+    <table id="tableLog">
+        <thead>
+        <tr>
+            <th>Workout Name</th>
+            <th>Workout Reps</th>
+            <th>Workout Weight</th>
+            <th>Workout Date</th>
+            <th>Workout Unit</th>
+            <th>Click to Edit/Delete Workout</th>
+        </tr>
+        </thead>
+
+
+    </table>
+    </p></p>
+</div>
+<span id="editForm">
+
+
+</span>
+<h1> mySQL table data: </h1>
+{{results}}
+
+<script type="text/javascript" src="script.js"></script>
+</body>
 </html>
